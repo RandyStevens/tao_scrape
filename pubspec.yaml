@@ -1,14 +1,13 @@
 name: tao_scrape
-description: A starting point for Dart libraries or applications.
+description: scrapes the tao of programming
 version: 0.0.1
-#homepage: https://www.example.com
-#author: randalstevens <email@example.com>
+#author: randal stevens
 
 environment:
   sdk: '>=1.20.1 <2.0.0'
 
-#dependencies:
-#  path: ^1.4.1
+dependencies:
+  html: any
 
 dev_dependencies:
   test: ^0.12.0
