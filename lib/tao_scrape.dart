@@ -3,20 +3,56 @@ import 'dart:async';
 import 'package:html/parser.dart';
 import 'package:html/dom.dart';
 
-main() {
+void list(String path) {
+  try {
+    Directory root = new Directory(path);
+    if(root.existsSync()) {
+      for(FileSystemEntity f in root.listSync()) {
+        print(f.path);
+      }
+    }
+  }
+  catch(e) {
+    print(e.toString());
+  }
+}
+
+main(List<String> arguments) {
+
   getHtml('http://www.mit.edu/~xela/tao.html').then((document) {
-    // page title
-    print(document.querySelector('title').text);
-    //remove the 'Where i got this text'
+    String title = document.querySelector('title').text.replaceAll(" ", "_");
+    String path = '/Users/randalstevens/Workspace/tao_scrape/writes/';
+    String txtFile = '/Users/randalstevens/Workspace/tao_scrape/writes/' + title +'.json';
+    writeFile(String file, String data, FileMode mode) {
+      try {
+        File f = new File(file);
+        RandomAccessFile rf = f.openSync(mode: mode);
+        rf.writeStringSync(data);
+        rf.flushSync();
+        rf.closeSync(); // may call flush
+        return true;
+      }
+      catch(e) {
+        print(e.toString());
+        return false;
+      }
+    }
     document.querySelector('p').remove();
-    //Get the length of our document
-    for (var p = 0; p < document.querySelectorAll('p').length;) {
+    list(path);
+    int index = 0;
+    int i;
+    String text;
+    for (i = 0; i < document.querySelectorAll('p').length;) {
+      print(index);
+      print(text);
       //print the text from the p tag
-      print(document.querySelector('p').text);
+      text = document.querySelector('p').text.trim().replaceAll('\"', '\'').replaceAll("\n", " ");
+      writeFile(txtFile, "\n\"$index\" : \"$text\",\n", FileMode.APPEND);
       //remove the first p tag before the loop ends
       document.querySelector('p').remove();
+      index++;
     }
-  });
+    });
 }
 
 // fetch and parse the HTML from [url]
