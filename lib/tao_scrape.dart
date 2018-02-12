@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:html/parser.dart';
 import 'package:html/dom.dart';
+import 'config.dart' as config;
 
 void list(String path) {
   try {
@@ -19,10 +20,16 @@ void list(String path) {
 
 main(List<String> arguments) {
 
-  getHtml('http://www.mit.edu/~xela/tao.html').then((document) {
+  getHtml(config.target.url).then((document) {
+    ///If you want a different file name or prefer camel case uncomment next line
+//    String title = document.querySelector('title').text.replaceFirst(" o", " O").replaceAll(" ", "").replaceFirst('T', 't');
     String title = document.querySelector('title').text.replaceAll(" ", "_");
-    String path = '/Users/randalstevens/Workspace/tao_scrape/writes/';
-    String txtFile = '/Users/randalstevens/Workspace/tao_scrape/writes/' + title +'.json';
+    String path = config.target.path;
+    //Grabs the title, inserts it into the path, adds the .json filetype
+    String txtFile = path + title +'.json';
+    //print the title of the file
+    print(title);
+    //write file logic
     writeFile(String file, String data, FileMode mode) {
       try {
         File f = new File(file);
@@ -37,22 +44,30 @@ main(List<String> arguments) {
         return false;
       }
     }
+    //Remove the "where i got this" text
     document.querySelector('p').remove();
-    list(path);
+
     int index = 0;
     int i;
     String text;
-    for (i = 0; i < document.querySelectorAll('p').length;) {
+    writeFile(txtFile, "{\n", FileMode.WRITE);
+    //we start at 1 so that we can encode to .json manually
+    for (i = 1; i < document.querySelectorAll('p').length;) {
+      //print the text you are encoding.
       print(index);
       print(text);
-      //print the text from the p tag
+      //get the text from the p tag
       text = document.querySelector('p').text.trim().replaceAll('\"', '\'').replaceAll("\n", " ");
+      //write it to the file
       writeFile(txtFile, "\n\"$index\" : \"$text\",\n", FileMode.APPEND);
       //remove the first p tag before the loop ends
       document.querySelector('p').remove();
       index++;
     }
-    });
+    //JSON doesn't like the last item to have a comma
+    writeFile(txtFile, "\n\"$index\" : \"$text\"\n", FileMode.APPEND);
+    writeFile(txtFile, "}", FileMode.APPEND);
+  });
 }
 
 // fetch and parse the HTML from [url]
