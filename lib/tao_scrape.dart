@@ -22,11 +22,14 @@ main(List<String> arguments) {
 
   getHtml(config.target.url).then((document) {
     ///If you want a different file name or prefer camel case uncomment next line
-//    String title = document.querySelector('title').text.replaceFirst(" o", " O").replaceAll(" ", "").replaceFirst('T', 't');
+    //String title = document.querySelector('title').text.replaceFirst(" o", " O").replaceAll(" ", "").replaceFirst('T', 't');
     String title = document.querySelector('title').text.replaceAll(" ", "_");
     String path = config.target.path;
     //Grabs the title, inserts it into the path, adds the .json filetype
     String txtFile = path + title +'.json';
+    int index = 0;
+    String text;
+    int i;
     //print the title of the file
     print(title);
     //write file logic
@@ -47,9 +50,6 @@ main(List<String> arguments) {
     //Remove the "where i got this" text
     document.querySelector('p').remove();
 
-    int index = 0;
-    int i;
-    String text;
     writeFile(txtFile, "{\n", FileMode.WRITE);
     //we start at 1 so that we can encode to .json manually
     for (i = 1; i < document.querySelectorAll('p').length;) {
@@ -64,6 +64,9 @@ main(List<String> arguments) {
       document.querySelector('p').remove();
       index++;
     }
+    //print last item you are writing
+    print(index);
+    print(text);
     //JSON doesn't like the last item to have a comma
     writeFile(txtFile, "\n\"$index\" : \"$text\"\n", FileMode.APPEND);
     writeFile(txtFile, "}", FileMode.APPEND);
