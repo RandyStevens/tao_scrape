@@ -30,6 +30,9 @@ main(List<String> arguments) {
     int index = 0;
     String text;
     int i;
+    String $ = "\e";
+
+
     //print the title of the file
     print(title);
     //write file logic
@@ -52,8 +55,25 @@ main(List<String> arguments) {
 
     writeFile(txtFile, "{\n", FileMode.WRITE);
     //we start at 1 so that we can encode to .json manually
-    for (i = 1; i < document.querySelectorAll('p').length;) {
+    text = document.querySelector('p').text.trim().replaceAll('\"', '\'').replaceAll("\n", " ");
+    writeFile(txtFile, "\n\"$index\" : \"$text\",\n", FileMode.APPEND);
+//    document.querySelector('p').remove();
+    index++;
+
+    text = document.querySelector('blockquote').text.trim().replaceAll('\"', '\'').replaceAll("\n", " ");
+    writeFile(txtFile, "\n\"$index\" : \"$text\",\n", FileMode.APPEND);
+    document.querySelector('blockquote').remove();
+    index++;
+
+//    text = document.querySelector($).text.trim().replaceAll('\"', '\'').replaceAll("\n", " ");
+//    document.querySelector($).remove();
+//    writeFile(txtFile, "\n\"$index\" : \"$text\",\n", FileMode.APPEND);
+//    index++;
+
+    for (i = 2; i <= document.querySelectorAll('p').length;) {
       //print the text you are encoding.
+      document.querySelector('p').remove();
+
       print(index);
       print(text);
       //get the text from the p tag
@@ -61,14 +81,13 @@ main(List<String> arguments) {
       //write it to the file
       writeFile(txtFile, "\n\"$index\" : \"$text\",\n", FileMode.APPEND);
       //remove the first p tag before the loop ends
-      document.querySelector('p').remove();
       index++;
     }
     //print last item you are writing
     print(index);
     print(text);
-    //JSON doesn't like the last item to have a comma
-    writeFile(txtFile, "\n\"$index\" : \"$text\"\n", FileMode.APPEND);
+//    JSON doesn't like the last item to have a comma
+    writeFile(txtFile, "\n\"$index\" : \"-Made with \u{2764}\"\n", FileMode.APPEND);
     writeFile(txtFile, "}", FileMode.APPEND);
   });
 }
